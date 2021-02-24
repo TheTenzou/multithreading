@@ -6,6 +6,8 @@
 #include <vector>
 using namespace std;
 
+int vector_size = 100;
+
 
 void init_vec(vector <vector <int>>& base) {
 	for (int i = 0; i < base.size(); i++)
@@ -19,7 +21,7 @@ void static_threads(int param, vector <vector <int>>& base) {
 	{
 		n = omp_get_thread_num();
 #pragma omp for schedule(static, param)
-		for (i = 1; i <= 10; i++) base[n].push_back(i);
+		for (i = 1; i <= vector_size; i++) base[n].push_back(i);
 	}
 }
 
@@ -29,7 +31,7 @@ void dynamic_threads(int param, vector <vector <int>>& base) {
 	{
 		n = omp_get_thread_num();
 #pragma omp for schedule(dynamic, param)
-		for (i = 1; i <= 10; i++) base[n].push_back(i);
+		for (i = 1; i <= vector_size; i++) base[n].push_back(i);
 	}
 }
 
@@ -39,7 +41,7 @@ void guided_threads(int param, vector <vector <int>>& base) {
 	{
 		n = omp_get_thread_num();
 #pragma omp for schedule(guided, param)
-		for (i = 1; i <= 10; i++) base[n].push_back(i);
+		for (i = 1; i <= vector_size; i++) base[n].push_back(i);
 	}
 }
 

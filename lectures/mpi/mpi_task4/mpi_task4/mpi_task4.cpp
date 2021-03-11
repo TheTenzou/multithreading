@@ -1,30 +1,14 @@
-// mpi_send-recv.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// mpi_task4.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
 #include <iostream>
 #include <mpi.h>
 
-int main(int argc, char** argv)
+int main(int argc, char* arg[])
 {
-    int rank;
-    int size;
-
-    MPI_Init(&argc, &argv);
-
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-	char msg[100] = "test";
-    if (rank == 0) {
-        //scanf_s(msg);
-        strncpy_s(msg, "hello", 100);
-    }
-	MPI_Bcast(&msg, sizeof(msg), MPI_CHAR, 0, MPI_COMM_WORLD);
-
-    printf("thread: %d, message: %s", rank, msg);
-
-    MPI_Finalize();
-    return 0;
+	const int N = 100;
+	
+	
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

@@ -4,11 +4,70 @@
 #include <iostream>
 #include <mpi.h>
 
-int main(int argc, char* arg[])
+int main(int argc, char* argv[])
 {
-	const int N = 100;
-	
-	
+	const int N = 100, M = 100;
+
+	int chunk, thread_count, thread, s_pos, e_pos;
+
+	double totalMax = 0;
+	double max = 0;
+	double s_time, e_time;
+
+	MPI_Status status;
+
+	MPI_Init(&argc, &argv);
+	MPI_Comm_size(MPI_COMM_WORLD, &thread_count);
+	MPI_Comm_rank(MPI_COMM_WORLD, &thread);
+
+	std::cout << "Process " << thread << " of " << thread_count << " started\n";
+
+	double x[N][M];
+
+	if (thread == 0) {
+		
+		for (int i = 0; i < N; i++) 
+			for (int j = 0; j < M; j++) 
+				x[i][j] =  (i + j);
+
+		s_time = MPI_Wtime();
+	}
+
+	if (thread_count > N) thread_count = N;
+
+	MPI_Bcast(x, N * M, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+	chunk = N / thread_count;
+	s_pos = chunk * thread;
+	e_pos = chunk * (thread + 1);
+	if (e_pos > N) e_pos = N;
+
+	for (int i = s_pos; i < e_pos; i++)
+		for (int j = 0; j < M; j++)
+			if (abs(x[i][j]) > max)
+				max = abs(x[i][j]);
+	if (thread == 0) {
+		std::cout << "Max of process number 0 = " << max << "\n";
+		totalMax = max;
+
+		for (int i = 1; i < thread_count; i++) {
+			MPI_Recv(&max, 1, MPI_DOUBLE, i, 0, MPI_COMM_WORLD, &status);
+			
+			std::cout << "Max of process number " << i << " = " << max << "\n";
+			totalMax = std::max(totalMax, max);
+		}
+
+		e_time = MPI_Wtime();
+	} else {
+		MPI_Send(&max, 1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
+	}
+
+	if (thread == 0) {
+		std::cout << "max is " << totalMax << "\n";
+		std::cout << "time is " << e_time - s_time << "\n";
+	}
+
+	MPI_Finalize();
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
